@@ -48,6 +48,8 @@ namespace RegistrationService
             });
 
             app.AddLicenseSignatureWebSocket(Configuration);
+
+            app.UseFileServer();
         }
     }
 }
