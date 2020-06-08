@@ -50,6 +50,6 @@ stages:
       inputs:
         azureSubscription: 'Free Trial(203125f4-f3c0-443e-a639-0fda5c7c4dfa)'
         appName: 'aspnetcore-websockets'
-        containers: '$(containerRegistry)/$(imageRepository)'
+        containers: 'aspnetcorewebsockets.azurecr.io/aspnetcorewebsockets'
         multicontainerConfigFile: '$(dockerfilePath)'
         containerCommand: 'dotnet RegistrationService.Web.dll':
