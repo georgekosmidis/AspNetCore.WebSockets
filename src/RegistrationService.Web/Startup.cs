@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RegistrationService.Core;
 using RegistrationService.Infrastructure;
 using RegistrationService.Web.Extensions;
 
@@ -47,6 +48,9 @@ namespace RegistrationService
             {
                 endpoints.MapControllers();
             });
+
+#warning All Origins Are Allowed
+            app.AddLicenseSignatureWebSocket("/ws", "*");
         }
     }
 }

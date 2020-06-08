@@ -18,8 +18,4 @@
     <ProjectReference Include="..\..\src\RegistrationService.Web\RegistrationService.Web.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Core\" />
-  </ItemGroup>
-
 </Project>
