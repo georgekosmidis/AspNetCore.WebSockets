@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using RegistrationService.Core.Entities;
+using RegistrationService.Web.Models.Request;
+using RegistrationService.Web.Models.Response;
 
-namespace RegistrationService.Web.Models.Automapper
+namespace RegistrationService.Models.Automapper
 {
-    public class LicenseProfiles
-    {
+	public class LicenseProfiles : Profile
+	{
 		public LicenseProfiles()
 		{
-	
+			CreateMap<LicenseRequestModel, LicenseDataModel>();
+			CreateMap<LicenseDataModel, LicenseResponseModel>().ReverseMap();
+			CreateMap<LicenseDataModel, LicenseMessage>();
 		}
 	}
+
 }

@@ -12,8 +12,8 @@ using RegistrationService.Web.Models.Response;
 
 namespace RegistrationService.Web.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/Licensing")]    
     public class LicensingController : ControllerBase
     {
         private readonly ILogger<LicensingController> _logger;
