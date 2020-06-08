@@ -12,3 +12,9 @@ This is a sample on how to work with .NET Core and WebSockets. The sample is abo
 - Testing
 	- Basic Unit testing for demo persistence layers
 	- Basic Integration for REST API and WebSocket
+- Azure
+	- Using Azure DevOps to Build, Test and Deploy
+	- Image is pushed in Azure Container Registry
+	- App is runnig in Azure App Service (http://aspnetcore-websockets.azurewebsites.net/)
+	- No SSL installed yet
+	
