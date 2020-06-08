@@ -52,4 +52,4 @@ stages:
         appName: 'aspnetcore-websockets'
         containers: 'aspnetcorewebsockets.azurecr.io/aspnetcorewebsockets'
         multicontainerConfigFile: '$(dockerfilePath)'
-        containerCommand: 'dotnet RegistrationService.Web.dll':
+        containerCommand: 'dotnet RegistrationService.Web.dll'
