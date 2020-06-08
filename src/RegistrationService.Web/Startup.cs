@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RegistrationService.Infrastructure;
 using RegistrationService.Web.Extensions;
 
 namespace RegistrationService
@@ -26,6 +27,7 @@ namespace RegistrationService
 
             services.RegisterAutoMapper();
 
+            services.AddInfrastructure();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

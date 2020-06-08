@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RegistrationService.Core\RegistrationService.Core.csproj" />
+    <ProjectReference Include="..\RegistrationService.Infrastructure\RegistrationService.Infrastructure.csproj" />
     <ProjectReference Include="..\RegistrationService.SharedKernel\RegistrationService.SharedKernel.csproj" />
   </ItemGroup>
 

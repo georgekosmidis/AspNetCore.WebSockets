@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using RegistrationService.Web.Models.Request;
+using RegistrationService.Web.Models.Response;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +47,12 @@ namespace RegistrationService.Web.IntegrationTests
             response.EnsureSuccessStatusCode();
             Assert.Equal("application/json; charset=utf-8",
                 response.Content.Headers.ContentType.ToString());
+
+            var body = await response.Content.ReadAsStringAsync();
+            var licenseResponse = JsonConvert.DeserializeObject<LicenseResponseModel>(body);
+
+            Assert.NotEqual(Guid.Empty, licenseResponse.Id);
+            Assert.Equal(licenseRequest.ContactPerson, licenseResponse.ContactPerson);
         }
 
         [Theory]
@@ -74,6 +82,11 @@ namespace RegistrationService.Web.IntegrationTests
             Assert.Equal("application/json; charset=utf-8",
                 response.Content.Headers.ContentType.ToString());
 
+            var body = await response.Content.ReadAsStringAsync();
+            var licenseResponse = JsonConvert.DeserializeObject<LicenseResponseModel>(body);
+
+            Assert.NotEqual(Guid.Empty, licenseResponse.Id);
+            Assert.Equal(licenseRequest.ContactPerson, licenseResponse.ContactPerson);
         }
 
     }
