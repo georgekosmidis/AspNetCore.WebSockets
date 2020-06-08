@@ -130,11 +130,12 @@
         var closeButton = document.getElementById("closeButton");
         var socket;
 
-        var scheme = document.location.protocol === "https:" ? "wss" : "ws";
+        var wscheme = document.location.protocol === "https:" ? "wss" : "ws";
+        var hscheme = document.location.protocol.replace(":", "");
         var port = document.location.port ? (":" + document.location.port) : "";
 
-        var customerEndpoint = document.location.protocol + "/api/licensing";
-        connectionUrl.value = scheme + "://" + document.location.hostname + port + "/ws";
+        var customerEndpoint = hscheme + "://" + document.location.hostname + port + "/api/licensing";
+        connectionUrl.value = wscheme + "://" + document.location.hostname + port + "/ws";
 
         function updateState() {
             function disable() {
