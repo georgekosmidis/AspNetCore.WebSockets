@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,12 +11,13 @@ namespace RegistrationService
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -33,6 +30,7 @@ namespace RegistrationService
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -49,8 +47,7 @@ namespace RegistrationService
                 endpoints.MapControllers();
             });
 
-#warning All Origins Are Allowed
-            app.AddLicenseSignatureWebSocket("/ws", "*");
+            app.AddLicenseSignatureWebSocket(Configuration);
         }
     }
 }

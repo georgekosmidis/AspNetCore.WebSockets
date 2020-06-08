@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using RegistrationService.Core.Middlewares;
+using RegistrationService.Core.Settings;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RegistrationService.Core
 {
     public static class StartupSetup
     {
-        public static IApplicationBuilder AddLicenseSignatureWebSocket(this IApplicationBuilder app, string url, params string[] origins)
+        public static IApplicationBuilder AddLicenseSignatureWebSocket(this IApplicationBuilder app, IConfiguration configuration)
         {
             var webSocketOptions = new WebSocketOptions()
             {
@@ -17,16 +18,22 @@ namespace RegistrationService.Core
                 ReceiveBufferSize = 4 * 1024
             };
 
-            foreach (var origin in origins)
+            //passing the IConfiguration doesn't feel right...
+            var settings = new LicenseSignatureWebSocketSettings();
+            configuration.GetSection(nameof(LicenseSignatureWebSocketSettings)).Bind(settings);
+
+            foreach (var origin in settings.AllowedOrigins)
             {
                 webSocketOptions.AllowedOrigins.Add(origin);
             }
 
             app.UseWebSockets(webSocketOptions);
 
-            app.UseMiddleware<LicenseSignatureGeneratorMiddleware>(url);
+            app.UseMiddleware<LicenseSignatureGeneratorMiddleware>(settings.Path);
 
             return app;
         }
+
+
     }
 }
