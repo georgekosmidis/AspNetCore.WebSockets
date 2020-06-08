@@ -46,11 +46,10 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-    - task: AzureRmWebAppDeployment@4
+    - task: AzureWebAppContainer@1
       inputs:
-        ConnectionType: 'AzureRM'
         azureSubscription: 'Free Trial(203125f4-f3c0-443e-a639-0fda5c7c4dfa)'
-        appType: 'webAppContainer'
-        WebAppName: 'aspnetcore-websockets'
-        DockerNamespace: 'aspnetcorewebsockets.azurecr.io/aspnetcorewebsockets'
-        DockerRepository: 'aspnetcorewebsockets.azurecr.io/aspnetcorewebsockets'
+        appName: 'aspnetcore-websockets'
+        containers: '$(containerRegistry)/$(imageRepository)'
+        multicontainerConfigFile: '$(dockerfilePath)'
+        containerCommand: 'dotnet RegistrationService.Web.dll':
