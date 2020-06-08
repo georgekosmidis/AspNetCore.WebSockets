@@ -7,24 +7,29 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RegistrationService.Core.Entities;
+using RegistrationService.SharedKernel.Interfaces;
 using RegistrationService.Web.Models.Request;
 using RegistrationService.Web.Models.Response;
 
 namespace RegistrationService.Web.Controllers
 {
     [ApiController]
-    [Route("api/Licensing")]    
+    [Route("api/Licensing")]
     public class LicensingController : ControllerBase
     {
         private readonly ILogger<LicensingController> _logger;
+        private readonly IQueueService<LicenseMessage> _queueService;
+        private readonly IStorageService<LicenseDataModel> _storageService;
         private readonly IMapper _mapper;
 
-        public LicensingController(ILogger<LicensingController> logger, IMapper mapper)
+        public LicensingController(ILogger<LicensingController> logger, IQueueService<LicenseMessage> queueService, IStorageService<LicenseDataModel> storageService, IMapper mapper)
         {
             _logger = logger;
+            _queueService = queueService;
+            _storageService = storageService;
             _mapper = mapper;
         }
-
 
         [HttpPost]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -33,32 +38,38 @@ namespace RegistrationService.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult SendLicenseRequest([FromBody] LicenseRequestModel licenseRequestModel)
         {
-            //PLAN:
-            //1. queque for the websocket to pickup
-            //2. store for the consumer to get updates
-            //3. respond 201 when all done
+            var licenseDataModel = _mapper.Map<LicenseDataModel>(licenseRequestModel);
 
-            //basic REST
-            return CreatedAtAction(nameof(GetLicenseResponse), new { id = Guid.Empty }, new LicenseResponseModel());
+            //queque for the websocket to pickup
+            _queueService.Enqueue(
+                _mapper.Map<LicenseMessage>(licenseDataModel)
+            );
 
+            //store for the consumer to get updates
+            _storageService.AddOrUpdate(licenseDataModel);
+
+            //201 response (REST)
+            var licenseResponse = _mapper.Map<LicenseResponseModel>(licenseDataModel);
+            return CreatedAtAction(nameof(GetLicenseResponse), new { id = licenseResponse.Id }, licenseResponse);
         }
+
 
         [HttpGet("{id}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LicenseResponseModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        //No Cache since the plan is for long polling
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult GetLicenseResponse(Guid id)
         {
-            //PLAN:
-            //1. search for the license
-            //2. return 404 if not found
-            //3. respond 200 if found
+            //search for a license request
+            var licenseDataModel = _storageService.Get(id);
 
-            //basic rest
-            return Ok(new LicenseResponseModel());
+            //404 response if not found (REST)
+            if (licenseDataModel == default)
+                return NotFound();
 
+            //200 if found
+            return Ok(_mapper.Map<LicenseResponseModel>(licenseDataModel));
         }
     }
 }
