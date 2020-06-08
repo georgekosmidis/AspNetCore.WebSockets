@@ -33,6 +33,10 @@ namespace RegistrationService.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult SendLicenseRequest([FromBody] LicenseRequestModel licenseRequestModel)
         {
+            //PLAN:
+            //1. queque for the websocket to pickup
+            //2. store for the consumer to get updates
+            //3. respond 201 when all done
 
             //basic REST
             return CreatedAtAction(nameof(GetLicenseResponse), new { id = Guid.Empty }, new LicenseResponseModel());
@@ -47,6 +51,11 @@ namespace RegistrationService.Web.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult GetLicenseResponse(Guid id)
         {
+            //PLAN:
+            //1. search for the license
+            //2. return 404 if not found
+            //3. respond 200 if found
+
             //basic rest
             return Ok(new LicenseResponseModel());
 
