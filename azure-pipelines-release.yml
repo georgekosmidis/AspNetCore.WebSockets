@@ -39,18 +39,3 @@ stages:
           $(tag)
           latest
 
-- stage: Deploy
-  displayName: Deploy to App Service
-  jobs:  
-  - job: Deploy
-    displayName: Deploy
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: AzureWebAppContainer@1
-      inputs:
-        azureSubscription: 'Free Trial(203125f4-f3c0-443e-a639-0fda5c7c4dfa)'
-        appName: 'aspnetcore-websockets'
-        containers: 'aspnetcorewebsockets.azurecr.io/aspnetcorewebsockets:latest'
-        multicontainerConfigFile: '$(dockerfilePath)'
-        containerCommand: 'dotnet RegistrationService.Web.dll'
