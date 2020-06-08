@@ -1,19 +1,8 @@
-# ASP.NET
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
-
 trigger:
-- master
-
-pr:
-  autoCancel: false
-  branches:
-    include:
-    - '*'
+  - none
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -30,4 +19,8 @@ steps:
     projects: '**/*.Tests.csproj'
     arguments: '--configuration Release'
     
-
+- task: Docker@2
+  displayName: DockerImage
+  inputs:
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
