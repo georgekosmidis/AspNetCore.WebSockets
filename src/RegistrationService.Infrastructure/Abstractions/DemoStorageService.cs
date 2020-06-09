@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using RegistrationService.SharedKernel.Interfaces;
+using RegistrationService.Core.Interfaces;
 
-namespace RegistrationService.Services
+namespace RegistrationService.Infrastructure.Abstractions
 {
     //Demo storage just for the exercise, there is no real persistence
-    public class DemoStorageService<T> : IStorageService<T> where T : class, IDataModel
+    public abstract class DemoStorageService<T> : IStorageService<T> where T : class, IDataModel
     {
         private readonly ConcurrentDictionary<Guid, T> db;
 
@@ -37,7 +36,6 @@ namespace RegistrationService.Services
 
             return Get(license.Id);
         }
-
-
+      
     }
 }

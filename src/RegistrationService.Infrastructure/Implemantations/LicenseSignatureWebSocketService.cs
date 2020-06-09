@@ -1,84 +1,34 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using RegistrationService.Core.Interfaces;
+using RegistrationService.Core.Messages;
+using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using RegistrationService.Core.Entities;
-using RegistrationService.SharedKernel.Interfaces;
 
-namespace RegistrationService.Core.Middlewares
+namespace RegistrationService.Infrastructure.Implemantations
 {
-    public class LicenseSignatureGeneratorMiddleware
+    public class LicenseSignatureWebSocketService : ILicenseSignatureWebSocketService
     {
-        private readonly RequestDelegate _next;
-        private readonly string _url;
+        private readonly ILicenseQueueService _queueService;
+        private readonly ILicenseStorageService _storageService;
         private readonly CancellationToken _appStoppingCancellationToken;
-        private readonly IQueueService<LicenseMessage> _queueService;
-        private readonly IStorageService<LicenseDataModel> _storageService;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
 
-        public LicenseSignatureGeneratorMiddleware(RequestDelegate next,
-            IQueueService<LicenseMessage> queueService,
-            IStorageService<LicenseDataModel> storageService,
-            IMapper mapper,
-            IApplicationLifetime appLifetime,
-            ILogger<LicenseSignatureGeneratorMiddleware> logger,
-            string url)
+        public LicenseSignatureWebSocketService(ILicenseQueueService queueService, ILicenseStorageService storageService, IMapper mapper, IApplicationLifetime appLifetime)
         {
-            _next = next;
-            _appStoppingCancellationToken = appLifetime.ApplicationStopping;
             _queueService = queueService;
             _storageService = storageService;
+            _appStoppingCancellationToken = appLifetime.ApplicationStopping;
             _mapper = mapper;
-            _logger = logger;
-            _url = url;
-
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        public async Task AcceptConnections(HttpContext context)
         {
-            try
-            {
-                await _InvokeAsync(context);
-            }
-            catch (Exception ex)
-            {
-                //This just logs in the console, proper logging, including the exception details is need for production
-                _logger.LogError(ex.Message);
-                throw;
-            }
-        }
-
-        private async Task _InvokeAsync(HttpContext context)
-        {
-            if (context.Request.Path != _url)
-            {
-                await _next.Invoke(context);
-                return;
-            }
-
-            if (!context.WebSockets.IsWebSocketRequest)
-            {
-                await WriteErrorResponse(context.Response, HttpStatusCode.BadRequest, "Expected WebSocket Request");
-                return;
-            }
-
-            if (!context.User.Identity.IsAuthenticated)
-            {
-#warning Unauthorized Access Allowed!
-                //using var rejectionSocket = await context.WebSockets.AcceptWebSocketAsync();
-                //await rejectionSocket.CloseAsync((WebSocketCloseStatus)4001, "User must authenticate", _cancellationToken);
-                //return;
-            }
 
             using (var webSocket = await context.WebSockets.AcceptWebSocketAsync())
             {
@@ -125,8 +75,6 @@ namespace RegistrationService.Core.Middlewares
 
             }
 
-            // Call the next delegate/middleware in the pipeline
-            await _next(context);
         }
 
         private async Task ReceiveMessagesAsync(WebSocket webSocket, CancellationToken cancellationToken)
@@ -162,14 +110,12 @@ namespace RegistrationService.Core.Middlewares
                         var licenseMessage = JsonConvert.DeserializeObject<LicenseMessage>(text);
                         try
                         {
-                            var licenseData = _mapper.Map<LicenseDataModel>(licenseMessage);
-                            licenseData.Status = SharedKernel.Messages.MessageStatus.Complete;
-                            _storageService.AddOrUpdate(licenseData);
+                            _storageService.UpdateMessageReceived(licenseMessage.Id, licenseMessage.SignedLicenseKey);
                         }
                         catch
                         {
-                            //something went wrong, try again later
                             // todo: needs refinement
+                            //something went wrong, try again later
                             _queueService.Enqueue(licenseMessage);
                             throw;
                         }
@@ -210,22 +156,6 @@ namespace RegistrationService.Core.Middlewares
                 }
 
             }
-        }
-
-        private static async Task WriteErrorResponse(HttpResponse response, HttpStatusCode statusCode, string message)
-        {
-            response.StatusCode = (int)statusCode;
-            response.ContentType = "application/problem+json";
-
-            //TODO: use ProblemDetailsFactory to produce correct problemDetails object
-            var problemDetails = new ProblemDetails
-            {
-                Status = (int)statusCode,
-                Title = "WebSocket Error",
-                Detail = message,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
-            };
-            await response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
         }
     }
 }

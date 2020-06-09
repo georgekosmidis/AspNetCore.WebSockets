@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
+using RegistrationService.Web;
 using RegistrationService.Web.Models.Request;
 using System;
 using System.Collections.Generic;

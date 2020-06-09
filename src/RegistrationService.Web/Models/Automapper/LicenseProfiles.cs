@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RegistrationService.Core.Entities;
+using RegistrationService.Core.Messages;
 using RegistrationService.Web.Models.Request;
 using RegistrationService.Web.Models.Response;
 

@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RegistrationService.Core;
 using RegistrationService.Infrastructure;
 using RegistrationService.Web.Extensions;
 
-namespace RegistrationService
+namespace RegistrationService.Web
 {
     public class Startup
     {
@@ -47,7 +46,7 @@ namespace RegistrationService
                 endpoints.MapControllers();
             });
 
-            app.AddLicenseSignatureWebSocket(Configuration);
+            app.AddLicenseSignatureWebSocketService(Configuration);
 
             app.UseFileServer();
         }

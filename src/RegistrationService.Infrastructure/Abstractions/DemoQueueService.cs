@@ -1,11 +1,10 @@
-﻿using RegistrationService.SharedKernel.Interfaces;
+﻿using RegistrationService.Core.Interfaces;
 using System.Collections.Concurrent;
-using System.Linq;
 
-namespace RegistrationService.Services
+namespace RegistrationService.Infrastructure.Abstractions
 {
     //Demo implemantation of a queue, there is no persistence
-    public class DemoQueueService<T> : IQueueService<T>
+    public abstract class DemoQueueService<T> : IQueueService<T>
     {
         private ConcurrentQueue<T> queque;
         public DemoQueueService() => queque = new ConcurrentQueue<T>();

@@ -1,6 +1,5 @@
 ﻿using RegistrationService.Core.Entities;
-using RegistrationService.Services;
-using System;
+using RegistrationService.Infrastructure.Implementations;
 using Xunit;
 
 namespace RegistrationService.Infrastructure.Tests
@@ -12,7 +11,7 @@ namespace RegistrationService.Infrastructure.Tests
         public void BasicTest()
         {
             //Arrange
-            var storageService = new DemoStorageService<LicenseDataModel>();
+            var storageService = new LicenseStorageService();
             var licenseDataModel = new LicenseDataModel
             {
                 ContactPerson = "George"

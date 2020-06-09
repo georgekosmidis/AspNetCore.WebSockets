@@ -1,5 +1,5 @@
-﻿using RegistrationService.SharedKernel.Interfaces;
-using RegistrationService.SharedKernel.Messages;
+﻿using RegistrationService.Core.Interfaces;
+using RegistrationService.Core.Messages;
 using System;
 
 namespace RegistrationService.Core.Entities

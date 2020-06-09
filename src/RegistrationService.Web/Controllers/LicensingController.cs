@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RegistrationService.Core.Entities;
-using RegistrationService.SharedKernel.Interfaces;
+using RegistrationService.Core.Interfaces;
+using RegistrationService.Core.Messages;
 using RegistrationService.Web.Models.Request;
 using RegistrationService.Web.Models.Response;
 
@@ -19,11 +17,11 @@ namespace RegistrationService.Web.Controllers
     public class LicensingController : ControllerBase
     {
         private readonly ILogger<LicensingController> _logger;
-        private readonly IQueueService<LicenseMessage> _queueService;
-        private readonly IStorageService<LicenseDataModel> _storageService;
+        private readonly ILicenseQueueService _queueService;
+        private readonly ILicenseStorageService _storageService;
         private readonly IMapper _mapper;
 
-        public LicensingController(ILogger<LicensingController> logger, IQueueService<LicenseMessage> queueService, IStorageService<LicenseDataModel> storageService, IMapper mapper)
+        public LicensingController(ILogger<LicensingController> logger, ILicenseQueueService queueService, ILicenseStorageService storageService, IMapper mapper)
         {
             _logger = logger;
             _queueService = queueService;

@@ -7,7 +7,6 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["RegistrationService.Web/RegistrationService.Web.csproj", "RegistrationService.Web/"]
 COPY ["RegistrationService.Infrastructure/RegistrationService.Infrastructure.csproj", "RegistrationService.Infrastructure/"]
-COPY ["RegistrationService.SharedKernel/RegistrationService.SharedKernel.csproj", "RegistrationService.SharedKernel/"]
 COPY ["RegistrationService.Core/RegistrationService.Core.csproj", "RegistrationService.Core/"]
 RUN dotnet restore "RegistrationService.Web/RegistrationService.Web.csproj"
 COPY . .

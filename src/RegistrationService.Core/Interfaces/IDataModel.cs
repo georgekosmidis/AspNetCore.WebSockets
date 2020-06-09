@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RegistrationService.SharedKernel.Interfaces
+namespace RegistrationService.Core.Interfaces
 {
     public interface IDataModel
     {

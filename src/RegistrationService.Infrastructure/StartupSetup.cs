@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RegistrationService.Services;
-using RegistrationService.SharedKernel.Interfaces;
+using RegistrationService.Infrastructure.Implemantations;
+using RegistrationService.Infrastructure.Implementations;
+using RegistrationService.Core.Interfaces;
 
 namespace RegistrationService.Infrastructure
 {
@@ -8,10 +9,13 @@ namespace RegistrationService.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(IQueueService<>), typeof(DemoQueueService<>));
-            services.AddSingleton(typeof(IStorageService<>), typeof(DemoStorageService<>));
+            services.AddSingleton<ILicenseQueueService, LicenseQueueService>();
+            services.AddSingleton<ILicenseStorageService, LicenseStorageService>();
+            services.AddSingleton<ILicenseSignatureWebSocketService, LicenseSignatureWebSocketService>();
 
             return services;
         }
+
+
     }
 }

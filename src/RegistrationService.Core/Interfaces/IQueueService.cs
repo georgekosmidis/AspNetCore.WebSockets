@@ -1,5 +1,5 @@
 ﻿
-namespace RegistrationService.SharedKernel.Interfaces
+namespace RegistrationService.Core.Interfaces
 {
     public interface IQueueService<T>
     {

@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using RegistrationService.Core.Middlewares;
-using RegistrationService.Core.Settings;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using Microsoft.AspNetCore.Builder;
+using RegistrationService.Core.Settings;
+using RegistrationService.Web.Middlewares;
+using Microsoft.Extensions.Configuration;
 
-namespace RegistrationService.Core
+namespace RegistrationService.Web.Extensions
 {
-    public static class StartupSetup
+    public static class StartupWebSockerExtensions
     {
-        public static IApplicationBuilder AddLicenseSignatureWebSocket(this IApplicationBuilder app, IConfiguration configuration)
+        public static IApplicationBuilder AddLicenseSignatureWebSocketService(this IApplicationBuilder app, IConfiguration configuration)
         {
             var webSocketOptions = new WebSocketOptions()
             {
@@ -33,7 +32,5 @@ namespace RegistrationService.Core
 
             return app;
         }
-
-
     }
 }

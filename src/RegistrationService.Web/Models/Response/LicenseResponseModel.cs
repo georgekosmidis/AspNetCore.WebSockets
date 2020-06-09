@@ -1,8 +1,6 @@
-﻿using RegistrationService.SharedKernel.Messages;
+﻿using RegistrationService.Core.Messages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace RegistrationService.Web.Models.Response
 {

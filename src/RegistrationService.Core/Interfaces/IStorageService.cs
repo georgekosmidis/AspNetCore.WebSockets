@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RegistrationService.SharedKernel.Interfaces
+namespace RegistrationService.Core.Interfaces
 {
     public interface IStorageService<T> where T : class, IDataModel
     {
