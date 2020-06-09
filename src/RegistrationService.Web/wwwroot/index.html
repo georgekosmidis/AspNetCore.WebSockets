@@ -1,292 +1,326 @@
-﻿<!--
-    Parts of this file are from https://github.com/dotnet/AspNetCore.Docs/blob/master/aspnetcore/fundamentals/websockets/samples/2.x/WebSocketsSample/wwwroot/index.html
--->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Demo</title>
-    <style>
-        table {
-            border: 0
-        }
+    <title>ASPNET Core, WebSocket Sample</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-        .commslog-data {
-            font-family: Consolas, Courier New, Courier, monospace;
-        }
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-        .commslog-server {
-            background-color: red;
-            color: white
-        }
+    <!-- Latest jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
-        .commslog-client {
-            background-color: green;
-            color: white
-        }
-    </style>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 </head>
 <body>
-    <table width="100%">
-        <tr>
-            <td valign="top">
-                <h1>End Customer WebForm </h1>
-                <div>
-                    <label for="companyName">Company Name:</label>
-                    <input id="companyName" value=" " />
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class"page-header">
+                    <h1>End Customer WebForm </h1>
+                    <div class="well">
+                        <p>
+                            An end customer sample form, where she/he fills in a hypothetical License Key.
+                            (<i>Some fields are hidden for simpler UI - check source code.</i>)
+                        </p>
+                    </div>
                 </div>
-                <p></p>
-                <div>
-                    <label for="contactPerson">Contact Person:</label>
-                    <input id="contactPerson" value="George Kosmidis" />
+            </div>
+            <div class="col-md-6">
+                <div class"page-header">
+                    <h1>License Signature Emulator</h1>
+                    <div class="well">
+                        <p>
+                            An license signature emulator that connects to the WebSocket, receives a license message, and sends "Signed License".
+                            (<i>Fields are automatically filled in.</i>)
+                        </p>
+                    </div>
                 </div>
-                <p></p>
-                <div>
-                    <label for="email">email:</label>
-                    <input id="email" value="georgekosmidis@outlook.com" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6" id="licenseForm">
+                <div for="inputCompanyName" style="display:none">Company Name</div>
+                <input id="inputCompanyName" class="form-control" placeholder="Contact Person" value="" style="display:none">
+                <br style="display:none" />
+                <div for="inputContactPerson" style="display:none">Company Person</div>
+                <input id="inputContactPerson" class="form-control d-none" placeholder="Contact Person" value="George" style="display:none">
+                <br style="display:none" />
+                <div for="inputEmail" style="display:none">inputEmail</div>
+                <input type="email" id="inputEmail" class="form-control" placeholder="email" value="gk@gk.gk" style="display:none">
+                <br style="display:none" />
+                <div for="inputAddress" style="display:none">Address</div>
+                <input id="inputAddress" class="form-control" placeholder="Address" value="Munich" style="display:none">
+                <br style="display:none" />
+                <div for="inputLicenseKey">License Key</div>
+                <input id="inputLicenseKey" class="form-control" placeholder="License Key" value="x7jgli7hs9">
+                <br />
+                <div for="inputLicenseSignature">License Signature</div>
+                <input id="inputLicenseSignature" class="form-control" placeholder="License Signature" readonly>
+                <br />
+                <button class="btn btn-lg btn-primary btn-block" id="btnSendLicenseRequest" type="submit">Send License Request</button>
+                <div class="alert d-none" role="alert" id="divSendLicenseRequestAlert"></div>
+                <div class="alert d-none" role="alert" id="divSendLicenseRequestLongPolling"></div>
+            </div>
+            <div class="col-md-6">
+                <div for="inputConnectionUrl">WebSocket Server URL</div>
+                <input id="inputConnectionUrl" class="form-control" placeholder="WebSocket Server URL" readonly>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-xs btn-success" id="btnWebSocketConnect" disabled>Connect</button>
+                        <button type="button" class="btn btn-xs btn-danger" id="btnWebSocketDisconnect" disabled>Disconnect</button>
+                    </div>
                 </div>
-                <p></p>
-                <div>
-                    <label for="address">Address:</label>
-                    <input id="address" value="Giesing, Munich" />
+                <div class="row my-2">
+                    <br />
+                    <div class="col-md-12">
+                        <div class="alert alert-info w-100" role="alert" id="divWebSocketInfo">Waiting for connection...</div>
+                    </div>
                 </div>
-                <p></p>
-                <div>
-                    <label for="licenseKey">License Key:</label>
-                    <input id="licenseKey" value="random_key" />
-                </div>
-                <p></p>
-                <div>
-                    <label for="licenseSignature">License Signature:</label>
-                    <input id="licenseSignature" value="" />
-                </div>
-                <p></p>
-                <button id="submitForm" type="submit">Submit Data</button>
-                <div id="submitFormMessage" style="width:500px"></div>
+                <div class="row my-2">
+                    <br />
+                    <div class="col-md-12">
+                        <div for="inputSampleLicenseSignature">Sample License Signature</div>
+                        <input id="inputSampleLicenseSignature" class="form-control" placeholder="Sample License Signature">
+                        <button class="btn btn-lg btn-primary btn-block" id="btnSendLicenseSignature" type="submit" disabled>Send Sample License Signature</button>
 
-                <h2>Long polling (every 3 secs)</h2>
-                <table style="width: 800px">
-                    <thead>
-                        <tr>
-                            <td style="width: 100px">DT</td>
-                            <td>Result</td>
-                        </tr>
-                    </thead>
-                    <tbody id="longPollingLog">
-                    </tbody>
-                </table>
-            </td>
-            <td valign="top">
-
-                <h1>License Signature Generator Emulator</h1>
-                <p id="stateLabel">Ready to connect...</p>
-                <div>
-                    <label for="connectionUrl">WebSocket Server URL:</label>
-                    <input id="connectionUrl" />
-                    <button id="connectButton" type="submit">Connect</button>
+                    </div>
                 </div>
-                <p></p>
-                <div>
-                    <label for="sendMessage">Sample Signature Response:</label>
-                    <textarea id="sendMessage" rows="4" cols="50" disabled></textarea>
-                    <button id="sendButton" type="submit" disabled>Send</button>
-                    <button id="closeButton" disabled>Close Socket</button>
+                <div class="row my-2">
+                    <h3>Websocket Connection log</h3>
+                    <div class="col-md-12">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyWebSocketCommLog">
+                            </tbody>
+                        </table>
+
+                    </div>
                 </div>
-
-                <h2>Communication Log</h2>
-                <table style="width: 800px">
-                    <thead>
-                        <tr>
-                            <td style="width: 100px">From</td>
-                            <td style="width: 100px">To</td>
-                            <td>Data</td>
-                        </tr>
-                    </thead>
-                    <tbody id="commsLog">
-                    </tbody>
-                </table>
-
-
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
     <script>
-        var fieldCompanyName = document.getElementById("companyName");
-        var fieldContactPerson = document.getElementById("contactPerson");
-        var fieldEmail = document.getElementById("email");
-        var fieldAddress = document.getElementById("address");
-        var fieldLicenseKey = document.getElementById("licenseKey");
-        var fieldLicenseSignature = document.getElementById("licenseSignature");
-        var submitForm = document.getElementById("submitForm");
-        var longPollingLog = document.getElementById("longPollingLog");
-
-
-        var connectionUrl = document.getElementById("connectionUrl");
-        var connectButton = document.getElementById("connectButton");
-        var stateLabel = document.getElementById("stateLabel");
-        var sendMessage = document.getElementById("sendMessage");
-        var sendButton = document.getElementById("sendButton");
-        var commsLog = document.getElementById("commsLog");
-        var closeButton = document.getElementById("closeButton");
-        var socket;
-
+        var longPollingInterval = 2000;
         var wscheme = document.location.protocol === "https:" ? "wss" : "ws";
         var hscheme = document.location.protocol.replace(":", "");
         var port = document.location.port ? (":" + document.location.port) : "";
 
-        var customerEndpoint = hscheme + "://" + document.location.hostname + port + "/api/licensing";
-        connectionUrl.value = wscheme + "://" + document.location.hostname + port + "/ws";
+        var licenseRequestEndpoint = hscheme + "://" + document.location.hostname + port + "/api/licensing";
+        var connectionUrl = wscheme + "://" + document.location.hostname + port + "/ws";
 
-        function updateState() {
-            function disable() {
-                sendMessage.disabled = true;
-                sendButton.disabled = true;
-                closeButton.disabled = true;
-            }
-            function enable() {
-                sendMessage.disabled = false;
-                sendButton.disabled = false;
-                closeButton.disabled = false;
-            }
+        var socket;
 
-            connectionUrl.disabled = true;
-            connectButton.disabled = true;
+        $(document).ready(function () {
+            $("#inputConnectionUrl").val(connectionUrl);
+            $("#btnWebSocketConnect").prop('disabled', false);
 
-            if (!socket) {
-                disable();
-            } else {
-                switch (socket.readyState) {
-                    case WebSocket.CLOSED:
-                        stateLabel.innerHTML = "Closed";
-                        disable();
-                        connectionUrl.disabled = false;
-                        connectButton.disabled = false;
-                        break;
-                    case WebSocket.CLOSING:
-                        stateLabel.innerHTML = "Closing...";
-                        disable();
-                        break;
-                    case WebSocket.CONNECTING:
-                        stateLabel.innerHTML = "Connecting...";
-                        disable();
-                        break;
-                    case WebSocket.OPEN:
-                        stateLabel.innerHTML = "Open";
-                        enable();
-                        break;
-                    default:
-                        stateLabel.innerHTML = "Unknown WebSocket State: " + htmlEscape(socket.readyState);
-                        disable();
-                        break;
+
+            $("#btnWebSocketConnect").click(function () {
+                $("#divWebSocketInfo").removeClass();
+                $("#divWebSocketInfo").addClass("alert alert-warning");
+                $("#divWebSocketInfo").html("Connecting...");
+
+                $("#btnWebSocketConnect").prop('disabled', true);
+
+                socket = new WebSocket($("#inputConnectionUrl").val());
+                socket.onopen = function (event) {
+                    updateWebSocketState();
+                    $("#tbodyWebSocketCommLog").append('<tr>' +
+                        '<td colspan="3" class="commslog-data">Connection opened</td>' +
+                        '</tr>');
+                };
+                socket.onclose = function (event) {
+                    updateWebSocketState();
+                    $("#tbodyWebSocketCommLog").append('<tr>' +
+                        '<td colspan="3" class="commslog-data">Connection closed. Code: ' + htmlEscape(event.code) + '. Reason: ' + htmlEscape(event.reason) + '</td>' +
+                        '</tr>');
+                };
+                socket.onerror = updateWebSocketState;
+                socket.onmessage = function (event) {
+
+                    $("#tbodyWebSocketCommLog").append('<tr>' +
+                        '<td class="bg-danger">Server</td>' +
+                        '<td class="bg-primary">Client</td>' +
+                        '<td><pre>' + htmlEscape(event.data) + '</pre></td></tr>');
+
+                    var data = JSON.parse(event.data);
+                    data.SignedLicenseKey = "Signature_" + (new Date()).getTime();
+                    $("#inputSampleLicenseSignature").val(JSON.stringify(data));
+                };
+            });
+
+            $("#btnWebSocketDisconnect").click(function () {
+                if (!socket || socket.readyState !== WebSocket.OPEN) {
+                    $("#divWebSocketInfo").addClass("alert alert-warning");
+                    $("#divWebSocketInfo").html("Socket not connected...");
+
                 }
-            }
-        }
+                socket.close(1000, "Closing from client");
+            });
 
-        submitForm.onclick = function () {
-            var xhr = new XMLHttpRequest();
-            submitFormMessage.innerHTML = "Sending...";
+            $("#btnSendLicenseSignature").click(function () {
+                if (!socket || socket.readyState !== WebSocket.OPEN) {
+                    alert("socket not connected");
+                }
+                var data = $("#inputSampleLicenseSignature").val();
+                socket.send(data);
+                $("#tbodyWebSocketCommLog").append('<tr>' +
+                    '<td class="bg-primary">Client</td>' +
+                    '<td class="bg-danger">Server</td>' +
+                    '<td><pre>' + htmlEscape(data) + '</pre></td></tr>');
+            });
 
+            $("#btnSendLicenseRequest").click(function () {
+                $("#divSendLicenseRequestAlert").removeClass();
+                $("#divSendLicenseRequestAlert").addClass("alert alert-warning");
+                $("#divSendLicenseRequestAlert").html("Sending...");
 
-            xhr.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    submitFormMessage.innerHTML = "<code>" + xhr.responseText + "</code>";
-                    var location = xhr.getResponseHeader("Location");
+                $.ajax({
+                    url: licenseRequestEndpoint,
+                    type: 'post',
+                    data: JSON.stringify({
+                        CompanyName: $("#inputCompanyName").val(),
+                        ContactPerson: $("#inputContactPerson").val(),
+                        Email: $("#inputEmail").val(),
+                        Address: $("#inputAddress").val(),
+                        LicenseKey: $("#inputLicenseKey").val()
+                    }),
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    dataType: 'json',
+                    success: function (data, textStatus, request) {
+                        $("#divSendLicenseRequestAlert").removeClass();
+                        $("#divSendLicenseRequestAlert").addClass("alert alert-success");
+                        $("#divSendLicenseRequestAlert").html("License Request successfuly sent, starting long polling for a signature...<br /> Hint: Please connect on the left to respond!");
 
-                    //if there is a valid response, start polling
-                    if (xhr.status == 201) {
-                        var xhrlp = new XMLHttpRequest();
-                        xhrlp.onreadystatechange = function () {
-                            if (this.readyState == 4) {
-                                longPollingLog.innerHTML += '<tr>' +
-                                    '<td class="commslog-server">' + (new Date()) + '</td>' +
-                                    '<td class="commslog-data"><code>' + htmlEscape(xhrlp.responseText) + '</code></td></tr>';
+                        var resource = request.getResponseHeader('Location');
+                        pollServer(resource);
+                    },
+                    error: function (data) {
+                        $("#divSendLicenseRequestAlert").removeClass();
+                        $("#divSendLicenseRequestAlert").addClass("alert alert-danger");
+                        $("#divSendLicenseRequestAlert").html("<b>An error has occured!</b><br />" + JSON.stringify(data));
+                    }
+                });
+            });
 
-                                var data = JSON.parse(xhrlp.responseText);
-                                //stop polling once the license is signed (data.status==30)
-                                if (data.status == 30) {
-                                    clearInterval(lp);//hoisting
-                                    fieldLicenseSignature.value = data.signedLicenseKey;
-                                    submitFormMessage.innerHTML = "<code>License Signed</code>";
-                                }
+            function pollServer(url) {
+                window.setTimeout(function () {
+                    $.ajax({
+                        url: url,
+                        type: "get",
+                        success: function (data) {
+                            if (data.status == 30) {
+                                $("#inputLicenseSignature").val(data.signedLicenseKey);
+
+                                $("#divSendLicenseRequestLongPolling").removeClass();
+                                $("#divSendLicenseRequestLongPolling").addClass("d-none");
+                                $("#divSendLicenseRequestLongPolling").html("");
+
+                                $("#divSendLicenseRequestAlert").removeClass();
+                                $("#divSendLicenseRequestAlert").addClass("alert alert-info");
+                                $("#divSendLicenseRequestAlert").html("License signature arrived: " + data.signedLicenseKey);
                             }
-                        };
+                            else {
+                                $("#divSendLicenseRequestLongPolling").removeClass();
+                                $("#divSendLicenseRequestLongPolling").addClass("alert alert-info");
+                                $("#divSendLicenseRequestLongPolling").html("Polling every " + longPollingInterval + " ms...<br />" + (new Date()));
+                                pollServer(url);
+                            }
+                        },
+                        error: function (data) {
+                            $("#divSendLicenseRequestAlert").removeClass();
+                            $("#divSendLicenseRequestAlert").addClass("alert alert-danger");
+                            $("#divSendLicenseRequestAlert").html("<b>An error has occured!</b><br />" + JSON.stringify(data));
+                        }
+                    });
+                }, longPollingInterval);
+            }
 
-                        var lp = setInterval(function () {
-                            xhrlp.open("GET", location + "?" + (new Date()).getTime(), true);
-                            xhrlp.send(null);
-                        }, 3000);
+            function updateWebSocketState() {
+                function disable() {
+                    $("#btnSendLicenseSignature").prop('disabled', true);
+                    $("#inputSampleLicenseSignature").prop('disabled', true);
+                    $("#btnWebSocketDisconnect").prop('disabled', true);
+                }
+                function enable() {
+                    $("#btnSendLicenseSignature").prop('disabled', false);
+                    $("#inputSampleLicenseSignature").prop('disabled', false);
+                    $("#btnWebSocketDisconnect").prop('disabled', false);
+                }
+
+                $("#inputConnectionUrl").prop('disabled', true);
+                $("#btnWebSocketConnect").prop('disabled', true);
+
+                if (!socket) {
+                    disable();
+                } else {
+                    switch (socket.readyState) {
+                        case WebSocket.CLOSED:
+                            $("#divWebSocketInfo").removeClass();
+                            $("#divWebSocketInfo").addClass("alert alert-danger");
+                            $("#divWebSocketInfo").html("Connecting is close.");
+                            disable();
+                            $("#inputConnectionUrl").prop('disabled', false);
+                            $("#btnWebSocketConnect").prop('disabled', false);
+                            break;
+                        case WebSocket.CLOSING:
+                            $("#divWebSocketInfo").removeClass();
+                            $("#divWebSocketInfo").addClass("alert alert-warning");
+                            $("#divWebSocketInfo").html("Connection closing...");
+                            disable();
+                            break;
+                        case WebSocket.CONNECTING:
+                            $("#divWebSocketInfo").removeClass();
+                            $("#divWebSocketInfo").addClass("alert alert-warning");
+                            $("#divWebSocketInfo").html("Connecting...");
+                            disable();
+                            break;
+                        case WebSocket.OPEN:
+                            $("#divWebSocketInfo").removeClass();
+                            $("#divWebSocketInfo").addClass("alert alert-success");
+                            $("#divWebSocketInfo").html("Connection is open!");
+                            enable();
+                            break;
+                        default:
+                            $("#divWebSocketInfo").removeClass();
+                            $("#divWebSocketInfo").addClass("alert alert-danger");
+                            $("#divWebSocketInfo").html("Unknown WebSocket State: " + htmlEscape(socket.readyState));
+                            disable();
+                            break;
                     }
                 }
-            };
-            xhr.open("POST", customerEndpoint, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-
-            xhr.send(JSON.stringify({
-                CompanyName: fieldCompanyName.value,
-                ContactPerson: fieldContactPerson.value,
-                Email: fieldEmail.value,
-                Address: fieldAddress.value,
-                LicenseKey: fieldLicenseKey.value
-            }));
-
-        };
-
-        closeButton.onclick = function () {
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                alert("socket not connected");
             }
-            socket.close(1000, "Closing from client");
-        };
 
-        sendButton.onclick = function () {
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                alert("socket not connected");
+            function htmlEscape(str) {
+                return str.toString()
+                    .replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
             }
-            var data = sendMessage.value;
-            socket.send(data);
-            commsLog.innerHTML += '<tr>' +
-                '<td class="commslog-client">Client</td>' +
-                '<td class="commslog-server">Server</td>' +
-                '<td class="commslog-data"><code>' + htmlEscape(data) + '</code></td></tr>';
-        };
-
-        connectButton.onclick = function () {
-            stateLabel.innerHTML = "Connecting";
-            socket = new WebSocket(connectionUrl.value);
-            socket.onopen = function (event) {
-                updateState();
-                commsLog.innerHTML += '<tr>' +
-                    '<td colspan="3" class="commslog-data">Connection opened</td>' +
-                    '</tr>';
-            };
-            socket.onclose = function (event) {
-                updateState();
-                commsLog.innerHTML += '<tr>' +
-                    '<td colspan="3" class="commslog-data">Connection closed. Code: ' + htmlEscape(event.code) + '. Reason: ' + htmlEscape(event.reason) + '</td>' +
-                    '</tr>';
-            };
-            socket.onerror = updateState;
-            socket.onmessage = function (event) {
-
-                commsLog.innerHTML += '<tr>' +
-                    '<td class="commslog-server">Server</td>' +
-                    '<td class="commslog-client">Client</td>' +
-                    '<td class="commslog-data"><code>' + htmlEscape(event.data) + '</code></td></tr>';
-                var data = JSON.parse(event.data);
-                data.SignedLicenseKey = "Signed_License: " + new Date();
-                sendMessage.value = JSON.stringify(data);
-
-            };
-        };
-
-        function htmlEscape(str) {
-            return str.toString()
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
+        });
     </script>
+    <footer>
+        <small>
+            <br /><br /><br /><br />
+            An ASPNET Core WebSockets sample. <br /> Builded, contenerized, hosted and published with Azure DevOps, Azure Container Registry and Azure App Service.
+            Full source code and more details in
+            <a href="https://github.com/georgekosmidis/AspNetCore.WebSockets/"> https://github.com/georgekosmidis/AspNetCore.WebSockets</a>.
+        </small>
+    </footer>
 </body>
 </html>
