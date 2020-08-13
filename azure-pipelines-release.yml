@@ -10,7 +10,7 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '09256dbe-1f7f-4354-93ab-9d56fef1ac77'
+  dockerRegistryServiceConnection: '3a969b10-2415-4e64-9bf3-221663d8cc5d'
   imageRepository: 'aspnetcorewebsockets'
   containerRegistry: 'aspnetcorewebsockets.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/src/Dockerfile'
