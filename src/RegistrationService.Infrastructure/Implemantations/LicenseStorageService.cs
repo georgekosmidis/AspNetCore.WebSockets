@@ -14,6 +14,10 @@ namespace RegistrationService.Infrastructure.Implementations
             {
                 throw new ArgumentNullException(nameof(id));
             }
+            if (signedLicense == null)
+            {
+                throw new ArgumentNullException(nameof(signedLicense));
+            }
 
             var license = base.Get(id);
             license.Status =  MessageStatus.Complete;

@@ -79,6 +79,7 @@ namespace RegistrationService.Infrastructure.Implemantations
 
         private async Task ReceiveMessagesAsync(WebSocket webSocket, CancellationToken cancellationToken)
         {
+
             //Loop until a cancel request is issued
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -120,7 +121,10 @@ namespace RegistrationService.Infrastructure.Implemantations
                             throw;
                         }
                     }
-
+                }
+                catch(WebSocketException ex) when (ex.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely)
+                {
+                    //Nothing received, nothing saved, all ok
                 }
                 catch (OperationCanceledException)
                 {

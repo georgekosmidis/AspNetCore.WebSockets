@@ -22,7 +22,7 @@ namespace RegistrationService.Core.IntegrationTests
     {
         [Theory]
         [InlineData("/api/Licensing")]
-        public async Task POSTLicenseRequestGETSignedLicense_WhenNewLicenseRequest_ShouldReturnignedLicense(string path)
+        public async Task POSTLicenseRequestGETSignedLicense_WhenNewLicenseRequest_ShouldReturnSignedLicense(string path)
         {
             //Arrange
             var builder = WebHost.CreateDefaultBuilder()
@@ -67,7 +67,7 @@ namespace RegistrationService.Core.IntegrationTests
                 recvMessage.AddRange(new ArraySegment<byte>(buffer, 0, recvResult.Count));
 
                 //orchestrate "generator" response
-                // alter george to george2 for Assert
+                // change george to george2 for Assert
                 var sendText = Encoding.UTF8.GetString(recvMessage.ToArray())
                     .Replace("George", "George2");
                 var sendBytes = Encoding.UTF8.GetBytes(sendText);
